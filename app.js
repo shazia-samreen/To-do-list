@@ -69,15 +69,23 @@ app.post("/", function(req, res){
 
 app.post("/delete", function(req,res){
   const deletedid=req.body.deleteitem;
-  console.log(deletedid);
-  Item.findByIdAndRemove(deletedid,function(err){
-    if(err){
-      console.log("Error in deletion");
-    }else{
-      console.log("Succesfully deleted");
-      res.redirect("/");
-    }
-  });
+  const dellist=req.body.Listname;
+  if(dellist=="Today"){
+    Item.findByIdAndRemove(deletedid,function(err){
+      if(err){
+        console.log("Error in deletion");
+      }else{
+        console.log("Succesfully deleted");
+        res.redirect("/");
+      }
+    });
+  }else{
+    List.findOneAndUpdate({name:dellist},{$pull:{items: {_id:deletedid}}},function(err,foundlist){
+        if(!err){
+          res.redirect("/"+ dellist);
+        }
+    });
+  }
 });
 app.get("/:customListName", function(req, res){
    const customListName=req.params.customListName;
